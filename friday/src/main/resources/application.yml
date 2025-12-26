@@ -1,0 +1,50 @@
+spring:
+  jackson:
+    time-zone: Asia/Shanghai
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/friday?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 1
+    minIdle: 3
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,slf4j
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+  jpa:
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+
+  sql:
+    init:
+      platform: mysql
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ""
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+token:
+  header: Authorization
+  secret: FRIDAY_$^11244^%$_IS_@@++--COOL_++++_sds_GUY_9A8F7C6B5D4E3F2A1B0C998877665544
+  expireTime: 60

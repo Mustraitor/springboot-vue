@@ -1,0 +1,77 @@
+@startuml
+top to bottom direction
+
+' ================= Controller 层 =================
+class SysUserController {
+    + list(user: SysUserVO, pageable: Pageable) : TableDataInfo
+    + getInfo(userId: Long) : RestResult
+    + add(user: SysUserVO) : RestResult
+    + edit(user: SysUserVO) : RestResult
+    + remove(userIds: Long[]) : RestResult
+}
+
+' ================= Service 接口 =================
+interface SysUserService {
+    + selectUserList(user: SysUserVO, pageable: Pageable) : TableDataInfo
+    + selectUserById(userId: Long) : SysUser
+    + insertUser(user: SysUserVO) : boolean
+    + updateUser(user: SysUserVO) : boolean
+    + deleteUserByIds(userIds: Long[]) : int
+}
+
+' ================= Service 实现类 =================
+class SysUserServiceImpl {
+    + selectUserList(user: SysUserVO, pageable: Pageable) : TableDataInfo
+    + selectUserById(userId: Long) : SysUser
+    + insertUser(user: SysUserVO) : boolean
+    + updateUser(user: SysUserVO) : boolean
+    + deleteUserByIds(userIds: Long[]) : int
+}
+
+' ================= JPA 基础接口 =================
+interface JpaRepository {
+    <<generic>>
+}
+
+' ================= Repository 层 =================
+interface SysUserRepository {
+    + deleteUserRoleByUserId(userId: Long) : int
+    + deleteUserByIds(userIds: long[]) : int
+    + findByUserName(userName: String) : SysUser
+}
+
+' ================= Model / VO =================
+class SysUser {
+    - userId : Long
+    - userName : String
+    - nickName : String
+    - email : String
+    - phonenumber : String
+    - password : String
+    - status : String
+    - delFlag : String
+}
+
+class SysUserVO {
+    - userId : Long
+    - userName : String
+    - nickName : String
+    - email : String
+    - phonenumber : String
+    - userType : String
+    - status : String
+    - roles : List<SysRoleVO>
+    - roleIds : Long[]
+    + isAdmin() : boolean
+}
+
+' ================= 类关系 =================
+SysUserController --> SysUserService : 调用
+SysUserService <|.. SysUserServiceImpl : 实现
+SysUserServiceImpl --> SysUserRepository : 调用
+SysUserRepository --> SysUser : 操作实体
+SysUserController --> SysUserVO : 接收参数
+SysUserServiceImpl --> SysUserVO : 使用
+SysUserRepository --|> JpaRepository
+
+@enduml
