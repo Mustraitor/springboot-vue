@@ -1,0 +1,66 @@
+services:
+  # 1. 数据库服务
+  friday-db:
+    image: mysql:8.0.39
+    container_name: friday-db # 增加容器命名，方便排查
+    # command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci 
+    environment:
+      MYSQL_DATABASE: friday
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai 
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql 
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+
+  # 2. Redis 缓存服务
+  friday-redis:
+    image: redis:latest
+    container_name: friday-redis
+    ports:
+      - "6379:6379"
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # 3. 后端服务
+  friday-server:
+    build: ./friday
+    container_name: friday-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      friday-db:
+        condition: service_healthy
+      friday-redis:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://friday-db:3306/friday?useUnicode=true&characterEncoding=utf-8&connectionCollation=utf8mb4_unicode_ci&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+
+      SPRING_DATA_REDIS_HOST: friday-redis
+      SPRING_DATA_REDIS_PORT: 6379
+    restart: always
+
+
+  # 4. 前端服务
+  friday-ui:
+    build: ./vue-element-admin-master
+    container_name: friday-ui
+    ports:
+      - "80:80"
+    depends_on:
+      - friday-server
+    restart: always

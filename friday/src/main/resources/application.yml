@@ -3,9 +3,9 @@ spring:
     time-zone: Asia/Shanghai
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/friday?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-    username: root
-    password: 123456
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://friday-db:3306/friday?useUnicode=true&characterEncoding=utf-8&connectionCollation=utf8mb4_unicode_ci&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:123456}
     type: com.alibaba.druid.pool.DruidDataSource
     initialSize: 1
     minIdle: 3
@@ -30,20 +30,15 @@ spring:
 
   sql:
     init:
+      encoding: UTF-8
       platform: mysql
 
   data:
     redis:
-      host: localhost
-      port: 6379
-      password: ""
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
       timeout: 10s
-      lettuce:
-        pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
-          max-wait: -1ms
 token:
   header: Authorization
   secret: FRIDAY_$^11244^%$_IS_@@++--COOL_++++_sds_GUY_9A8F7C6B5D4E3F2A1B0C998877665544
